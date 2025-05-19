@@ -6,6 +6,7 @@ use std::net::{SocketAddr, IpAddr};
 use std::str::FromStr;
 use std::sync::Arc;
 
+use tower_http::trace::{self, TraceLayer};
 use tower_http::cors::{CorsLayer, Any};
 use tracing::Level;
 
@@ -14,6 +15,10 @@ use routes::create_router;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::INFO)
+        .init();
 
     let config = match Config::from_env() {
         Ok(cfg) => Arc::new(cfg),
@@ -32,6 +37,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .allow_origin(Any); // TODO: Make this more restrictive later
     
     let app = create_router(config)
+        .layer(
+            TraceLayer::new_for_http()
+                .make_span_with(trace::DefaultMakeSpan::new().level(Level::INFO))
+                .on_response(trace::DefaultOnResponse::new().level(Level::INFO)),
+        )
         .layer(cors);
 
     tracing::info!("Starting server at {}", addr);
