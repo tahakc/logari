@@ -86,4 +86,20 @@ impl ApiClient {
             current_page: page,
         })
     }
+
+    pub async fn get_game_details(&self, game_id: u32) -> Result<Value> {
+        let url = format!("{}/games/{}", RAWG_API_URL, game_id);
+
+        let response = self.client
+            .get(&url)
+            .query(&[
+                ("key", &self.config.api.rawg_api_key),
+            ])
+            .send()
+            .await?
+            .json::<Value>()
+            .await?;
+
+        Ok(response)
+    }
 }

@@ -19,6 +19,7 @@ pub fn create_router(config: Arc<Config>) -> Router {
     
     let game_routes = Router::new()
         .route("/game/search", post(game::search_game))
+        .route("/game/{id}", get(game::get_game_details))
         .with_state(api_client.clone());
 
     Router::new()
