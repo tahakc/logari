@@ -54,3 +54,12 @@ pub async fn get_new_releases(
     let new_releases = api_client.get_new_releases(page).await?;
     Ok(Json(new_releases))
 }
+
+pub async fn get_upcoming_games(
+    State(api_client): State<ApiClient>,
+    Query(params): Query<PageQuery>,
+) -> Result<Json<serde_json::Value>> {
+    let page = params.page.unwrap_or(1);
+    let upcoming_games = api_client.get_upcoming_games(page).await?;
+    Ok(Json(upcoming_games))
+}

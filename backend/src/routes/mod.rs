@@ -21,6 +21,7 @@ pub fn create_router(config: Arc<Config>) -> Router {
         .route("/game/search", post(game::search_game))
         .route("/game/popular", get(game::get_popular_games))
         .route("/game/new_releases", get(game::get_new_releases))
+        .route("/game/upcoming", get(game::get_upcoming_games))
         .route("/game/{id}", get(game::get_game_details))
         .with_state(api_client.clone());
 
