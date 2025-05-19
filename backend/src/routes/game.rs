@@ -45,3 +45,12 @@ pub async fn get_popular_games(
     let popular_games = api_client.get_popular_games(page).await?;
     Ok(Json(popular_games))
 }
+
+pub async fn get_new_releases(
+    State(api_client): State<ApiClient>,
+    Query(params): Query<PageQuery>,
+) -> Result<Json<serde_json::Value>> {
+    let page = params.page.unwrap_or(1);
+    let new_releases = api_client.get_new_releases(page).await?;
+    Ok(Json(new_releases))
+}

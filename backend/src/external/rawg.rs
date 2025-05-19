@@ -121,4 +121,27 @@ impl ApiClient {
 
         Ok(response)
     }
+
+    pub async fn get_new_releases(&self, page: u32) -> Result<Value> {
+        let now = Utc::now();
+        let thirty_days_ago = now - Duration::days(30);
+
+        let url = format!("{}/games", RAWG_API_URL);
+
+        let response = self.client
+            .get(&url)
+            .query(&[
+                ("key", &self.config.api.rawg_api_key),
+                ("dates", &format!("{},{}", thirty_days_ago.format("%Y-%m-%d"), now.format("%Y-%m-%d"))),
+                ("ordering", &"-added".to_string()),
+                ("page", &page.to_string()),
+                ("page_size", &"20".to_string()),
+            ])
+            .send()
+            .await?
+            .json::<Value>()
+            .await?;
+
+        Ok(response)
+    }
 }
