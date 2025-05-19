@@ -69,4 +69,25 @@ impl IntoResponse for AppError {
     }
 }
 
+pub type Result<T> = std::result::Result<T, AppError>;
+
+// Util for converting different error types
+impl From<reqwest::Error> for AppError {
+    fn from(error: reqwest::Error) -> Self {
+       AppError::ExternalApi(error.to_string()) 
+    }
+}
+
+impl From<std::env::VarError> for AppError {
+    fn from(error: std::env::VarError) -> Self {
+        AppError::Config(error.to_string())
+    }
+}
+
+// could just not use anyhow but anyways
+impl From<anyhow:Error> for AppError {
+    fn from(error: anyhow::Error) -> Self {
+        AppError::Internal(error.to_string())
+    }
+}
 
