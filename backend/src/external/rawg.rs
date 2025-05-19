@@ -102,4 +102,23 @@ impl ApiClient {
 
         Ok(response)
     }
+
+    pub async fn get_popular_games(&self, page: u32) -> Result<Value> {
+        let url = format!("{}/games", RAWG_API_URL);
+
+        let response = self.client
+            .get(&url)
+            .query(&[
+                ("key", &self.config.api.rawg_api_key),
+                ("ordering", &"-rating".to_string()),
+                ("page", &page.to_string()),
+                ("page_size", &"20".to_string()),
+            ])
+            .send()
+            .await?
+            .json::<Value>()
+            .await?;
+
+        Ok(response)
+    }
 }
