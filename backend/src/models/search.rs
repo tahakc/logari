@@ -26,7 +26,7 @@ pub struct SearchResponse {
     pub current_page: u32,
 }
 
-#[derive(Debug, Serailize)]
+#[derive(Debug, Serialize)]
 pub struct SearchResult {
     pub id: String,
     pub title: String,

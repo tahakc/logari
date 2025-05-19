@@ -5,6 +5,7 @@ use std::env;
 #[derive(Debug, Clone, Deserialize)]
 pub struct Config {
     pub server: ServerConfig,
+    pub api: ApiConfig,
     pub auth: AuthConfig,
 }
 
@@ -12,6 +13,11 @@ pub struct Config {
 pub struct ServerConfig {
     pub host: String,
     pub port: u16,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct ApiConfig {
+    pub rawg_api_key: String,
 }
 
 // Will add jwt validation later
@@ -31,13 +37,18 @@ impl Config {
             .unwrap_or_else(|_| "8080".to_string())
             .parse()
             .expect("PORT must be a numbver");
-        
+
+        let rawg_api_key = env::var("RAWG_API_KEY")?;
+
         // Wil add jwt validation later
         let supabase_url = env::var("SUPABASE_URL").ok();
         let supabase_jwt_secret = env::var("SUPABASE_JWT_SECRET").ok();
 
         Ok(Config {
             server: ServerConfig { host, port },
+            api: ApiConfig {
+                rawg_api_key,
+            },
             auth: AuthConfig {
                 supabase_url,
                 supabase_jwt_secret,

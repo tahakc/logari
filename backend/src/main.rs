@@ -1,6 +1,8 @@
 mod config;
 mod routes;
 mod external;
+mod models;
+mod error;
 
 use std::net::{SocketAddr, IpAddr};
 use std::str::FromStr;

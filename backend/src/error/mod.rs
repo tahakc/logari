@@ -85,7 +85,7 @@ impl From<std::env::VarError> for AppError {
 }
 
 // could just not use anyhow but anyways
-impl From<anyhow:Error> for AppError {
+impl From<anyhow::Error> for AppError {
     fn from(error: anyhow::Error) -> Self {
         AppError::Internal(error.to_string())
     }
