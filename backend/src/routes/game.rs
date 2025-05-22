@@ -31,7 +31,7 @@ pub async fn search_game(
 
 pub async fn get_game_details(
     State(api_client): State<ApiClient>,
-    Path(game_id): Path<u32>,
+    Path(game_id): Path<String>,
 ) -> Result<Json<serde_json::Value>> {
     let game_details = api_client.get_game_details(game_id).await?;
     Ok(Json(game_details))

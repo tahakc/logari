@@ -150,7 +150,7 @@ impl ApiClient {
         })
     }
 
-    pub async fn get_game_details(&self, game_id: u32) -> Result<Value> {
+    pub async fn get_game_details(&self, game_id: String) -> Result<Value> {
         let url = format!("{}/games/{}", RAWG_API_URL, game_id);
 
         let response = self.client
