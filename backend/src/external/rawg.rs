@@ -3,7 +3,7 @@ use chrono::{Utc, Duration};
 use serde_json::Value;
 
 use crate::error::{AppError, Result};
-use crate::models::search::{MediaType, SearchResponse, SearchResult};
+use crate::models::search::{MediaType, SearchResponse, SearchResult, Genre, Platform, EsrbRating, Tag, Screenshot};
 use super::ApiClient;
 
 const RAWG_API_URL: &str = "https://api.rawg.io/api";
@@ -27,6 +27,56 @@ struct RawgGame {
     slug: Option<String>,
     #[serde(default)]
     metacritic: Option<u32>,
+    rating_top: Option<i32>,
+    playtime: Option<i32>,
+    #[serde(default)]
+    genres: Vec<RawgGenre>,
+    #[serde(default)]
+    platforms: Vec<RawgPlatformWrapper>,
+    esrb_rating: Option<RawgEsrbRating>,
+    #[serde(default)]
+    tags: Vec<RawgTag>,
+    #[serde(default)]
+    short_screenshots: Vec<RawgScreenshot>,
+}
+
+#[derive(Debug, Deserialize)]
+struct RawgGenre {
+    id: i32,
+    name: String,
+    slug: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct RawgPlatformWrapper {
+    platform: RawgPlatform,
+}
+
+#[derive(Debug, Deserialize)]
+struct RawgPlatform {
+    id: i32,
+    name: String,
+    slug: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct RawgEsrbRating {
+    id: i32,
+    name: String,
+    slug: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct RawgTag {
+    id: i32,
+    name: String,
+    slug: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct RawgScreenshot {
+    id: i32,
+    image: String,
 }
 
 impl ApiClient {
@@ -48,22 +98,7 @@ impl ApiClient {
 
         let results = response.results
             .into_iter()
-            .map(|game| {
-                let description = Some(format!(
-                    "Game ID: {}, {}{}",
-                    game.id,
-                    if let Some(mc) = game.metacritic {
-                        format!("Metacritic: {}/100, ", mc)
-                    } else {
-                        "".to_string()
-                    },
-                    if let Some(slug) = game.slug {
-                        format!("Slug: {}", slug)
-                    } else {
-                        "".to_string()
-                    }
-                ));
-
+            .map(|game| { 
                 SearchResult {
                     id: game.id.to_string(),
                     title: game.name,
@@ -71,7 +106,35 @@ impl ApiClient {
                     poster_path: game.background_image,
                     release_date: game.released,
                     rating: game.rating,
-                    description,
+                    description: None,
+                    slug: game.slug,
+                    rating_top: game.rating_top,
+                    metacritic: game.metacritic,
+                    playtime: game.playtime,
+                    genres: Some(game.genres.into_iter().map(|g| Genre {
+                        id: g.id,
+                        name: g.name,
+                        slug: g.slug,
+                    }).collect()),
+                    platforms: Some(game.platforms.into_iter().map(|p| Platform {
+                        id: p.platform.id,
+                        name: p.platform.name,
+                        slug: p.platform.slug,
+                    }).collect()),
+                    esrb_rating: game.esrb_rating.map(|e| EsrbRating {
+                        id: e.id,
+                        name: e.name,
+                        slug: e.slug,
+                    }),
+                    tags: Some(game.tags.into_iter().map(|t| Tag {
+                        id: t.id,
+                        name: t.name,
+                        slug: t.slug,
+                    }).collect()),
+                    screenshots: Some(game.short_screenshots.into_iter().map(|s| Screenshot {
+                        id: s.id,
+                        image: s.image,
+                    }).collect()),
                 }
             })
             .collect();

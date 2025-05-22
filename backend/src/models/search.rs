@@ -60,7 +60,7 @@ pub struct Platform {
     pub slug: String,
 }
 
-#[derive(Debug, Serialize, Deserialie)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct EsrbRating {
     pub id: i32,
     pub name: String,
@@ -77,5 +77,5 @@ pub struct Tag {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Screenshot {
     pub id: i32,
-    pub name: String,
+    pub image: String,
 }
